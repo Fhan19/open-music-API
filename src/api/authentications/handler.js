@@ -33,7 +33,7 @@ class AuthenticationsHandler {
     return response
   }
 
-  async putAlbumByIdHandler (request, h) {
+  async putAuthenticationHandler (request, h) {
     this._validator.validatePutAuthenticationPayload(request.payload)
 
     const { refreshToken } = request.payload
@@ -50,7 +50,7 @@ class AuthenticationsHandler {
     }
   }
 
-  async deleteAlbumByIdHandler (request, h) {
+  async deleteAuthenticationHandler (request, h) {
     this._validator.validateDeleteAuthenticationPayload(request.payload)
 
     const { refreshToken } = request.payload
