@@ -1,6 +1,6 @@
 const autoBind = require('auto-bind')
 
-class AlbumHandler {
+class AlbumsHandler {
   constructor (service, validator) {
     this._service = service
     this._validator = validator
@@ -57,4 +57,4 @@ class AlbumHandler {
   }
 }
 
-module.exports = AlbumHandler
+module.exports = AlbumsHandler
