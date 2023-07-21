@@ -26,7 +26,9 @@ exports.up = pgm => {
       type: 'integer'
     },
     albumId: {
-      type: 'TEXT'
+      type: 'TEXT',
+      references: 'albums(id)',
+      onDelete: 'cascade'
     }
   })
 }
