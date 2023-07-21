@@ -10,7 +10,7 @@ class SongsService {
   }
 
   async addSong ({ title, year, performer, genre, duration, albumId }) {
-    const id = 'song-' + nanoid(16)
+    const id = `song-${nanoid(16)}`
 
     const query = {
       text: 'INSERT INTO songs VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING id',
@@ -26,8 +26,13 @@ class SongsService {
     return result.rows[0].id
   }
 
-  async getSongs () {
-    const result = await this._pool.query('SELECT * FROM songs')
+  async getSongs ({ title = '', performer = '' }) {
+    const query = {
+      text: 'SELECT id, title, performer FROM songs WHERE title ILIKE $1 AND performer ILIKE $2',
+      values: [`%${title}%`, `%${performer}%`]
+    }
+
+    const result = await this._pool.query(query)
     return result.rows.map(mapSongDBToModel)
   }
 
@@ -45,10 +50,10 @@ class SongsService {
     return result.rows.map(mapSongDBToModel)[0]
   }
 
-  async editSongById (id, { title, year, genre, performer, duration }) {
+  async editSongById (id, { title, year, genre, performer, duration, albumId }) {
     const query = {
-      text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5 WHERE id = $6 RETURNING id',
-      values: [title, year, genre, performer, duration, id]
+      text: 'UPDATE songs SET title = $1, year = $2, genre = $3, performer = $4, duration = $5, "albumId" = $7 WHERE id = $6 RETURNING id',
+      values: [title, year, genre, performer, duration, id, albumId]
     }
 
     const result = await this._pool.query(query)

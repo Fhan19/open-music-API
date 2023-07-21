@@ -16,6 +16,7 @@ class SongsHandler {
 
     const response = h.response({
       status: 'success',
+      message: 'Lagu berhasil ditambahkan',
       data: {
         songId
       }
@@ -24,21 +25,18 @@ class SongsHandler {
     return response
   }
 
-  async getSongsHandler () {
-    const songs = await this._service.getSongs()
+  async getSongsHandler (request) {
+    const params = request.query
+    const songs = await this._service.getSongs(params)
     return {
       status: 'success',
       data: {
-        songs: songs.map((s) => ({
-          id: s.id,
-          title: s.title,
-          performer: s.performer
-        }))
+        songs
       }
     }
   }
 
-  async getSongByIdHandler (request, h) {
+  async getSongByIdHandler (request) {
     const { id } = request.params
     const song = await this._service.getSongById(id)
     return {
@@ -49,7 +47,7 @@ class SongsHandler {
     }
   }
 
-  async putSongByIdHandler (request, h) {
+  async putSongByIdHandler (request) {
     this._validator.validateSongPayload(request.payload)
     const { id } = request.params
 
@@ -61,9 +59,10 @@ class SongsHandler {
     }
   }
 
-  async deleteSongByIdHandler (request, h) {
+  async deleteSongByIdHandler (request) {
     const { id } = request.params
     await this._service.deleteSongById(id)
+
     return {
       status: 'success',
       message: 'Lagu berhasil dihapus'
