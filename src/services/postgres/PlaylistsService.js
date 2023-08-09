@@ -105,14 +105,14 @@ class PlaylistsService {
 
   async deleteSongFromPlaylist (id) {
     const query = {
-      text: 'SELECT * FROM playlists WHERE id = $1',
+      text: 'DELETE FROM playlist_songs WHERE id = $1 RETURNING id',
       values: [id]
     }
 
     const result = await this._pool.query(query)
 
     if (!result.rowCount) {
-      throw new NotFoundError('Playlist tidak ditemukan!')
+      throw new NotFoundError('Lagu gagal dihapus. Lagu tidak ditemukan dalam playlist!')
     }
 
     return result.rows[0]
@@ -138,7 +138,8 @@ class PlaylistsService {
   async getPlaylistActivity (playlistId) {
     const query = {
       text: `SELECT u.username, s.title, act.action, act.time FROM playlists_activities act LEFT JOIN playlists p ON 
-      psa.playlist_id = p.id LEFT JOIN songs s ON act.song_id = s.id LEFT JOIN users u ON act.user_id = u.id WHERE p.id = $1`,
+      act.playlist_id = p.id LEFT JOIN songs s ON act.song_id = s.id LEFT JOIN users u ON act.user_id = u.id WHERE p.id = $1
+      ORDER BY act.time ASC`,
       values: [playlistId]
     }
 
@@ -177,15 +178,27 @@ class PlaylistsService {
       if (error instanceof NotFoundError) {
         throw error
       }
-    }
-
-    try {
-      await this._collaborationsService.verifyCollaborator(playlistId, userId)
-    } catch (error) {
-      if (error instanceof NotFoundError) {
+      try {
+        await this._collaborationService.verifyCollaborator(playlistId, userId)
+      } catch {
         throw error
       }
     }
+  }
+
+  async verifySongFromPlaylist (playlistId, songId) {
+    const query = {
+      text: 'SELECT * FROM playlist_songs WHERE playlist_id = $1 AND song_id = $2',
+      values: [playlistId, songId]
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new InvariantError('Soang dar Playlist gagal diverifikasi')
+    }
+
+    return result.rows[0].id
   }
 }
 

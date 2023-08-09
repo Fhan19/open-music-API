@@ -71,7 +71,7 @@ const init = async () => {
     validate: (artifacts) => ({
       isValid: true,
       credentials: {
-        userId: artifacts.decoded.payload.userId
+        userId: artifacts.decoded.payload.id
       }
     })
   })
@@ -110,8 +110,8 @@ const init = async () => {
     { // playlists
       plugin: playlists,
       options: {
-        service: playlistsService,
         songsService,
+        service: playlistsService,
         validator: PlaylistsValidator
       }
     },

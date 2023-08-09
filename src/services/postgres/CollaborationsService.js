@@ -11,13 +11,13 @@ class CollaborationsService {
     const id = `collabs-${nanoid(16)}`
 
     const query = {
-      text: 'INSERT INTO collaborations VALUES($1, $2, $3) RETURNING id',
+      text: 'INSERT INTO collaborations VALUES ($1, $2, $3) RETURNING id',
       values: [id, playlistId, userId]
     }
 
     const result = await this._pool.query(query)
 
-    if (!result.rowCount) {
+    if (!result.rows[0].id) {
       throw new InvariantError('Kolaborasi gagal ditambahkan!')
     }
 
