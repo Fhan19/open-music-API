@@ -38,14 +38,13 @@ class CollaborationsService {
   }
 
   async verifyCollaborator (playlistId, userId) {
-    console.log(playlistId, userId)
     const query = {
       text: 'SELECT id FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
       values: [playlistId, userId]
     }
 
     const result = await this._pool.query(query)
-    console.log(result)
+
     if (!result.rowCount) {
       throw new InvariantError('Tidak ada Kolaborasi!')
     }
