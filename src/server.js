@@ -46,9 +46,17 @@ const uploads = require('./api/uploads')
 const UploadsService = require('./services/postgres/UploadsService')
 const UploadsValidator = require('./validator/uploads')
 
+// album likes
+const albumlikes = require('./api/albumlikes')
+const AlbumsLikesService = require('./services/postgres/AlbumsLikesService')
+
 const StorageService = require('./services/storage/StorageService')
 
+const CacheService = require('./services/redis/CacheService')
+
 const ClientError = require('./exceptions/ClientError')
+
+const config = require('./utils/config.js')
 
 const init = async () => {
   const albumsService = new AlbumsService()
@@ -59,10 +67,12 @@ const init = async () => {
   const playlistsService = new PlaylistsService(collaborationsService)
   const storageService = new StorageService(path.resolve(__dirname, 'api/uploads/file/images'))
   const uploadsService = new UploadsService()
+  const cacheService = new CacheService()
+  const albumLikesService = new AlbumsLikesService(albumsService, cacheService)
 
   const server = Hapi.server({
-    port: process.env.PORT,
-    host: process.env.HOST,
+    port: config.app.port,
+    host: config.app.host,
     routes: {
       cors: {
         origin: ['*']
@@ -80,12 +90,12 @@ const init = async () => {
   ])
 
   server.auth.strategy('openmusic_jwt', 'jwt', {
-    keys: process.env.ACCESS_TOKEN_KEY,
+    keys: config.token.key,
     verify: {
       aud: false,
       iss: false,
       sub: false,
-      maxAgeSec: process.env.ACCESS_TOKEN_AGE
+      maxAgeSec: config.token.age
     },
     validate: (artifacts) => ({
       isValid: true,
@@ -157,6 +167,12 @@ const init = async () => {
         service: uploadsService,
         storageService,
         validator: UploadsValidator
+      }
+    },
+    { // album likes
+      plugin: albumlikes,
+      options: {
+        service: albumLikesService
       }
     }
   ])

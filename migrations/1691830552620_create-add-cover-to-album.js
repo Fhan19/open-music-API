@@ -8,5 +8,5 @@ exports.up = pgm => {
 }
 
 exports.down = pgm => {
-  pgm.dropColumn('albums', 'cover')
+  pgm.dropColumn('albums', 'cover_url')
 }
