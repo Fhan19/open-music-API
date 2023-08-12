@@ -161,7 +161,7 @@ class PlaylistsService {
     const result = await this._pool.query(query)
 
     if (!result.rowCount) {
-      throw new NotFoundError('Playlist Owner tidak ditemukan!')
+      throw new NotFoundError('Playlist tidak ditemukan!')
     }
 
     const playlist = result.rows[0]
@@ -179,7 +179,7 @@ class PlaylistsService {
         throw error
       }
       try {
-        await this._collaborationService.verifyCollaborator(playlistId, userId)
+        await this._collaborationsService.verifyCollaborator(playlistId, userId)
       } catch {
         throw error
       }
