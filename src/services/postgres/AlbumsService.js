@@ -41,7 +41,10 @@ class AlbumsService {
     }
 
     return {
-      ...query.rows[0],
+      id: query.rows[0].id,
+      name: query.rows[0].name,
+      year: query.rows[0].year,
+      coverUrl: query.rows[0].cover_url,
       songs: querySong.rows
     }
   }
